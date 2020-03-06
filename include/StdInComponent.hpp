@@ -9,15 +9,12 @@ class StdInComponent
 public:
     virtual bool Initialize()override
     {
+        mHandle = STDIN_FILENO;
         return true;
     }
     virtual bool Finish()override
     {
         return true;
-    }
-    virtual handle_t GetHandle()override
-    {
-        return STDIN_FILENO;
     }
     virtual bool OnRead(std::string &readContent)override
     {

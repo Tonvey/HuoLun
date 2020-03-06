@@ -12,6 +12,7 @@ int main()
     }
     auto comp = StdInComponent::Create<StdInComponent>();
     core.AddComponent(comp);
+    core.Run();
     core.Finish();
     return 0;
 }

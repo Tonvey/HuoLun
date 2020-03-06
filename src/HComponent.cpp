@@ -1,6 +1,10 @@
 #include "HComponent.h"
 #include "HLayer.h"
 
+HComponent::HComponent()
+{
+    mNeedClosed = false;
+}
 HComponent::~HComponent()
 {
     ResetQueue();
@@ -10,12 +14,14 @@ bool HComponent::PushLayerBack(HLayer *layer)
     assert(layer);
     layer->Retain();
     mLayers.push_back(layer);
+    return true;
 }
 bool HComponent::PushLayerFront(HLayer *layer)
 {
     assert(layer);
     layer->Retain();
     mLayers.push_front(layer);
+    return true;
 }
 HLayer *HComponent::PopLayerFront()
 {
