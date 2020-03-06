@@ -1,5 +1,6 @@
 #pragma once
 #include "HObject.h"
+#include "HLayer.h"
 #include <list>
 #include <string>
 class HLayer;

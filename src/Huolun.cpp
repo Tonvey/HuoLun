@@ -1,5 +1,5 @@
-#include "Huolun.h"
-#include "HComponent.h"
+#include "HuolunCore/Huolun.h"
+#include "HuolunCore/HComponent.h"
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/event.h>

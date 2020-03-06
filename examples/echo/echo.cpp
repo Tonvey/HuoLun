@@ -1,5 +1,5 @@
 #include "Huolun.h"
-#include "StdInComponent.hpp"
+#include "HuolunCore/StdInComponent.hpp"
 #include <iostream>
 using namespace std;
 int main()
