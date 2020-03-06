@@ -1,20 +1,21 @@
-#include "HuoLun.h"
+#include "Huolun.h"
 #include "HComponent.h"
 #include <unistd.h>
 #include <sys/event.h>
 Huolun::Huolun()
 {
 }
-virtual ~Huolun::Huolun()
+Huolun::~Huolun()
 {
-    for (auto itr : m_ChannelList)
+    for (auto itr : mMapOfHandleComponent)
     {
-        itr->Fini();
-        delete itr;
+        auto hcomp = itr.second;
+        hcomp->Finish();
     }
+    mMapOfHandleComponent.clear();
     if (mCoreHandle >= 0)
     {
-        close(m_kernel_handle);
+        close(mCoreHandle);
     }
 }
 bool Huolun::Initialize()
@@ -32,7 +33,7 @@ bool Huolun::Finish()
 bool Huolun::AddComponent(HComponent *comp)
 {
     handle_t h = comp->GetHandle();
-    if(this->mMapOfHandle.find(h)!=mMapOfHandle.end())
+    if(this->mMapOfHandleComponent.find(h)!=mMapOfHandleComponent.end())
     {
         // has add
         return true;
@@ -41,19 +42,19 @@ bool Huolun::AddComponent(HComponent *comp)
     {
         return false;
     }
-    mMapofHandle.insert(make_pair(h,comp));
-    com->retain();
+    mMapOfHandleComponent.insert(std::make_pair(h,comp));
+    comp->Retain();
     return true;
 }
 bool Huolun::RemoveComponent(handle_t handle)
 {
-    auto it = this->mMapOfHandle.find(handle);
-    if(it==mMapOfHandle.end())
+    auto it = this->mMapOfHandleComponent.find(handle);
+    if(it==mMapOfHandleComponent.end())
     {
         // has add
         return true;
     }
-    mMapofHandle.erase(it);
-    it->release();
-    return false;
+    it->second->Release();
+    mMapOfHandleComponent.erase(it);
+    return true;
 }

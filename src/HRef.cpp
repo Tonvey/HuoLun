@@ -10,7 +10,7 @@ HRef::~HRef()
 }
 void HRef::Retain()
 {
-    assert(mRefCount>0);
+    assert(mRefCount>=0);
     ++mRefCount;
 }
 void HRef::Release()

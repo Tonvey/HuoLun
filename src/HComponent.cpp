@@ -1,33 +1,44 @@
 #include "HComponent.h"
+#include "HLayer.h"
 
-bool HComponent::PushLayer(HLayer *layer)
+HComponent::~HComponent()
+{
+    ResetQueue();
+}
+bool HComponent::PushLayerBack(HLayer *layer)
 {
     assert(layer);
-    layer->retain();
+    layer->Retain();
     mLayers.push_back(layer);
+}
+bool HComponent::PushLayerFront(HLayer *layer)
+{
+    assert(layer);
+    layer->Retain();
+    mLayers.push_front(layer);
 }
 HLayer *HComponent::PopLayerFront()
 {
     auto ret = mLayers.front();
     mLayers.pop_front();
     //TODO : need release ?
-    ret.release();
+    ret->Release();
     return ret;
 }
 HLayer *HComponent::PopLayerBack()
 {
     auto ret = mLayers.back();
     mLayers.pop_back();
-    ret.release();
+    ret->Release();
     return ret;
 }
 void HComponent::ResetQueue()
 {
     for(auto i : mLayers)
     {
-        i->release();
+        i->Release();
     }
-    mLayers.swap(layer_queue_t());
+    mLayers.clear();
 }
 int HComponent::QueueSize()
 {

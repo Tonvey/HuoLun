@@ -1,8 +1,8 @@
 #pragma once
 #include <map>
+#include "HTypes.h"
 class HLayer;
 class HComponent;
-typedef int handle_t;
 class Huolun
 {
 public:
@@ -18,5 +18,5 @@ public:
 private:
     handle_t mCoreHandle;
     //TODO : Container choose optimize
-    std::map<handle_t,HComponent*> mMapOfHandle;
+    std::map<handle_t,HComponent*> mMapOfHandleComponent;
 };

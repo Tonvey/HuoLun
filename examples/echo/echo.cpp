@@ -1,4 +1,5 @@
-#include "HuoLun.h"
+#include "Huolun.h"
+#include "StdInComponent.hpp"
 #include <iostream>
 using namespace std;
 int main()
@@ -9,7 +10,8 @@ int main()
         cerr<<"Huolun init fail"<<endl;
         return -1;
     }
-    core.AddComponent();
+    auto comp = StdInComponent::Create<StdInComponent>();
+    core.AddComponent(comp);
     core.Finish();
     return 0;
 }
