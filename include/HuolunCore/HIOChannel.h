@@ -7,6 +7,7 @@ class HIOChannel
     :virtual public HObject
 {
 public:
+    friend HReactor;
     //Initialize object and create the fd/handle here
     virtual bool Initialize()=0;
     //Call when unregister from reactor core , destroy fd/handle here
@@ -17,9 +18,12 @@ public:
     virtual bool IsNeedClosed(){return mNeedClosed;};
     void SetClosed(bool val){mNeedClosed = val;};
     void SetReactor(HReactor *reactor){mReactor = reactor;}
-private:
-    bool mNeedClosed = false;
+    EIOStat GetIOStat()const{return mIOStat;}
+    EIOStat SetIOStat(EIOStat stat){mIOStat=stat;}
 protected:
     handle_t mHandle=-1;
     HReactor *mReactor=nullptr;
+private:
+    bool mNeedClosed = false;
+    EIOStat mIOStat = EIOStat::None;
 };

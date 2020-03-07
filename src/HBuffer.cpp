@@ -1,5 +1,6 @@
 #include "HuolunCore/HBuffer.h"
 #include <cstring>
+#include <cassert>
 HBuffer::HBuffer()
 {
 }

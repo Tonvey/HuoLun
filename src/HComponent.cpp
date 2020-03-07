@@ -1,6 +1,7 @@
 #include "HuolunCore/HComponent.h"
 #include "HuolunCore/HLayer.h"
 #include "HuolunCore/Reactor/HReactor.h"
+#include <cassert>
 #include <iostream>
 using namespace std;
 

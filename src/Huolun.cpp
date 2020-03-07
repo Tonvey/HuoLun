@@ -1,6 +1,7 @@
 #include "HuolunCore/Huolun.h"
 #include "HuolunCore/HIOChannel.h"
 #include "HuolunCore/Reactor/HReactorFactory.h"
+#include <cassert>
 #include <iostream>
 using namespace std;
 Huolun::Huolun()
