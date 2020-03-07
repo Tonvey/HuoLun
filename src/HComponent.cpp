@@ -2,9 +2,6 @@
 #include "HuolunCore/HLayer.h"
 #include "HuolunCore/Reactor/HReactor.h"
 #include <cassert>
-#include <iostream>
-using namespace std;
-
 HComponent::HComponent()
 {
 }
@@ -14,7 +11,6 @@ HComponent::~HComponent()
 }
 void HComponent::PushBufferBack(HBuffer *buf)
 {
-    cout<<"Push Buffer back"<<endl;
     assert(buf);
     buf->Retain();
     mBuffers.push_back(buf);

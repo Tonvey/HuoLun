@@ -21,12 +21,10 @@ public:
     }
     virtual bool OnRead(HBuffer *buffer)override
     {
-        cout<<"Stdout::OnRead"<<endl;
         return false;
     }
     virtual bool OnWrite(const HBuffer *buffer)override
     {
-        cout<<"OnWrite"<<endl;
         std::string str(buffer->GetData(),buffer->GetSize());
         cout<<str<<endl;
         return true;
