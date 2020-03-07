@@ -42,19 +42,19 @@ bool HKqueueReactor::Finish()
     mRunningFlag = RunningFlag::Created;
     return true;
 }
-bool HKqueueReactor::RegisterRead(HIOChannel *ch)
+bool HKqueueReactor::RegisterReadImpl(HIOChannel *ch)
 {
     return KqueueModFilter(ch,EVFILT_READ,EV_ADD);
 }
-bool HKqueueReactor::UnregisterRead(HIOChannel *ch)
+bool HKqueueReactor::UnregisterReadImpl(HIOChannel *ch)
 {
     return KqueueModFilter(ch,EVFILT_READ,EV_DELETE);
 }
-bool HKqueueReactor::RegisterWrite(HIOChannel *ch)
+bool HKqueueReactor::RegisterWriteImpl(HIOChannel *ch)
 {
     return KqueueModFilter(ch,EVFILT_WRITE,EV_ADD);
 }
-bool HKqueueReactor::UnregisterWrite(HIOChannel *ch)
+bool HKqueueReactor::UnregisterWriteImpl(HIOChannel *ch)
 {
     return KqueueModFilter(ch,EVFILT_WRITE,EV_DELETE);
 }

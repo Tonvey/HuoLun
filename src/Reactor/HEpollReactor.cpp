@@ -42,10 +42,8 @@ bool HEpollReactor::Finish()
     mRunningFlag = RunningFlag::Created;
     return true;
 }
-bool HEpollReactor::RegisterRead(HIOChannel *ch)
+bool HEpollReactor::RegisterReadImpl(HIOChannel *ch)
 {
-    if(ch->GetIOStat()&EIOStat::In)
-        return true;
     int op = EPOLL_CTL_MOD;
     if(ch->GetIOStat()==None)
     {
@@ -53,31 +51,17 @@ bool HEpollReactor::RegisterRead(HIOChannel *ch)
     }
     int events = EPOLLIN;
     events |= (ch->GetIOStat()&EIOStat::Out)?EPOLLOUT:0;
-    if(EpollCtl(ch,op,events))
-    {
-        ch->SetIOStat(EIOStat(ch->GetIOStat()|EIOStat::In));
-        return true;
-    }
-    return false;
+    return EpollCtl(ch,op,events);
 }
-bool HEpollReactor::UnregisterRead(HIOChannel *ch)
+bool HEpollReactor::UnregisterReadImpl(HIOChannel *ch)
 {
-    if(ch->GetIOStat()&EIOStat::In==0)
-        return true;
     int op = EPOLL_CTL_MOD;
     int events = 0;
     events |= (ch->GetIOStat()&EIOStat::Out)?EPOLLOUT:0;
-    if(EpollCtl(ch,op,events))
-    {
-        ch->SetIOStat(EIOStat(ch->GetIOStat()&~EIOStat::In));
-        return true;
-    }
-    return false;
+    return EpollCtl(ch,op,events);
 }
-bool HEpollReactor::RegisterWrite(HIOChannel *ch)
+bool HEpollReactor::RegisterWriteImpl(HIOChannel *ch)
 {
-    if(ch->GetIOStat()&EIOStat::Out)
-        return true;
     int op = EPOLL_CTL_MOD;
     if(ch->GetIOStat()==None)
     {
@@ -85,26 +69,14 @@ bool HEpollReactor::RegisterWrite(HIOChannel *ch)
     }
     int events = EPOLLOUT;
     events |= (ch->GetIOStat()&EIOStat::In)?EPOLLIN:0;
-    if(EpollCtl(ch,op,events))
-    {
-        ch->SetIOStat(EIOStat(ch->GetIOStat()|EIOStat::Out));
-        return true;
-    }
-    return false;
+    return EpollCtl(ch,op,events);
 }
-bool HEpollReactor::UnregisterWrite(HIOChannel *ch)
+bool HEpollReactor::UnregisterWriteImpl(HIOChannel *ch)
 {
-    if(ch->GetIOStat()&EIOStat::Out==0)
-        return true;
     int op = EPOLL_CTL_MOD;
     int events = 0;
     events |= (ch->GetIOStat()&EIOStat::In)?EPOLLIN:0;
-    if(EpollCtl(ch,op,events))
-    {
-        ch->SetIOStat(EIOStat(ch->GetIOStat()&~EIOStat::Out));
-        return true;
-    }
-    return false;
+    return EpollCtl(ch,op,events);
 }
 bool HEpollReactor::EpollCtl(HIOChannel *ch,int op ,int events)
 {

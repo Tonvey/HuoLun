@@ -19,7 +19,7 @@ public:
     void SetClosed(bool val){mNeedClosed = val;};
     void SetReactor(HReactor *reactor){mReactor = reactor;}
     EIOStat GetIOStat()const{return mIOStat;}
-    EIOStat SetIOStat(EIOStat stat){mIOStat=stat;}
+    void SetIOStat(EIOStat stat){mIOStat=stat;}
 protected:
     handle_t mHandle=-1;
     HReactor *mReactor=nullptr;
