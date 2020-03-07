@@ -21,7 +21,6 @@ void HComponent::PopBufferFront()
     auto element = mBuffers.front();
     mBuffers.pop_front();
     element->Release();
-    SetWriteFlag();
 }
 void HComponent::ResetBuffer()
 {

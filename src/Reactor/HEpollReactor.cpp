@@ -69,7 +69,7 @@ bool HEpollReactor::UnregisterRead(HIOChannel *ch)
     events |= (ch->GetIOStat()&EIOStat::Out)?EPOLLOUT:0;
     if(EpollCtl(ch,op,events))
     {
-        ch->SetIOStat(EIOStat(ch->GetIOStat()|EIOStat::In));
+        ch->SetIOStat(EIOStat(ch->GetIOStat()&~EIOStat::In));
         return true;
     }
     return false;
@@ -101,7 +101,7 @@ bool HEpollReactor::UnregisterWrite(HIOChannel *ch)
     events |= (ch->GetIOStat()&EIOStat::In)?EPOLLIN:0;
     if(EpollCtl(ch,op,events))
     {
-        ch->SetIOStat(EIOStat(ch->GetIOStat()|EIOStat::Out));
+        ch->SetIOStat(EIOStat(ch->GetIOStat()&~EIOStat::Out));
         return true;
     }
     return false;
