@@ -14,18 +14,18 @@ public:
         if(direction==HandleDirection::Forward)
         {
             auto nextMsg = HandleMessageForward(msg);
-            if(GetNextHandler()!=nullptr)
+            if(nextMsg!=nullptr&&GetNextHandler()!=nullptr)
             {
-                GetNextHandler()->Handle(direction,msg);
+                GetNextHandler()->Handle(direction,nextMsg);
                 nextMsg->Release();
             }
         }
         if(direction==HandleDirection::Backward)
         {
             auto nextMsg = HandleMessageBackward(msg);
-            if(GetPrevHandler()!=nullptr)
+            if(nextMsg!=nullptr&&GetPrevHandler()!=nullptr)
             {
-                GetPrevHandler()->Handle(direction,msg);
+                GetPrevHandler()->Handle(direction,nextMsg);
                 nextMsg->Release();
             }
         }

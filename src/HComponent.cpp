@@ -1,6 +1,8 @@
 #include "HuolunCore/HComponent.h"
 #include "HuolunCore/HLayer.h"
 #include "HuolunCore/Reactor/HReactor.h"
+#include <iostream>
+using namespace std;
 
 HComponent::HComponent()
 {
@@ -11,6 +13,7 @@ HComponent::~HComponent()
 }
 void HComponent::PushBufferBack(HBuffer *buf)
 {
+    cout<<"Push Buffer back"<<endl;
     assert(buf);
     buf->Retain();
     mBuffers.push_back(buf);
@@ -37,9 +40,13 @@ void HComponent::TriggerRead()
 }
 void HComponent::SetWriteFlag()
 {
+    assert(mReactor);
+    mReactor->RegisterWrite(this);
 }
 void HComponent::ClearWriteFlag()
 {
+    assert(mReactor);
+    mReactor->UnregisterWrite(this);
 }
 void HComponent::TriggerWrite()
 {
@@ -66,6 +73,7 @@ HMessage *HComponent::HandleMessageForward(HMessage *msg)
     if(!OnRead(ret->GetBytes()))
     {
         ret->Release();
+        ret=nullptr;
     }
     return ret;
 }

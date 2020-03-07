@@ -1,5 +1,6 @@
-#ifdef __HUOLUN_PLATFORM_APPLE__
 #include "HuolunCore/Reactor/HKqueueReactor.h"
+#include "HuolunCore/HIOChannel.h"
+#ifdef __HUOLUN_PLATFORM_APPLE__
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/event.h>
@@ -9,15 +10,17 @@ HKqueueReactor::HKqueueReactor()
 }
 HKqueueReactor::~HKqueueReactor()
 {
+    Stop();
+    Finish();
 }
 bool HKqueueReactor::Initialize()
 {
     if(mRunningFlag== RunningFlag::Created)
     {
-        mCoreHandle = kqueue();
+        mKqueueFd = kqueue();
         mRunningFlag = RunningFlag::Initialized;
     }
-    return mCoreHandle>=0;
+    return mKqueueFd>=0;
 }
 bool HKqueueReactor::Finish()
 {
@@ -27,106 +30,109 @@ bool HKqueueReactor::Finish()
     }
     for (auto itr : mMapOfHandleChannel)
     {
-        auto hcomp = itr.second;
-        hcomp->Finish();
+        auto ch = itr.second;
+        ch->Finish();
     }
     mMapOfHandleChannel.clear();
-    if(mCoreHandle>=0)
+    if(mKqueueFd>=0)
     {
-        close(mCoreHandle);
+        close(mKqueueFd);
+        mKqueueFd=-1;
     }
     mRunningFlag = RunningFlag::Created;
     return true;
 }
-bool HKqueueReactor::Register(HIOChannel *ch,EIOStat flag=EIOStat::In)
+bool HKqueueReactor::RegisterRead(HIOChannel *ch)
+{
+    return KqueueModFilter(ch,EVFILT_READ,EV_ADD);
+}
+bool HKqueueReactor::UnregisterRead(HIOChannel *ch)
+{
+    return KqueueModFilter(ch,EVFILT_READ,EV_DELETE);
+}
+bool HKqueueReactor::RegisterWrite(HIOChannel *ch)
+{
+    return KqueueModFilter(ch,EVFILT_WRITE,EV_ADD);
+}
+bool HKqueueReactor::UnregisterWrite(HIOChannel *ch)
+{
+    return KqueueModFilter(ch,EVFILT_WRITE,EV_DELETE);
+}
+bool HKqueueReactor::KqueueModFilter(HIOChannel *ch,int filter,int flag)
+{
+    bool ret = false;
+    struct kevent stEvent;
+    EV_SET(&stEvent, ch->GetHandle(),filter, flag , 0, 0, ch);
+    if(kevent(mKqueueFd, &stEvent, 1, NULL, 0, NULL)==0)
+    {
+        ret = true;
+    }
+    else
+    {
+        ch->Finish();
+    }
+    return ret;
+}
+bool HKqueueReactor::Install(HIOChannel *ch)
 {
     if(mRunningFlag<RunningFlag::Initialized)
     {
         return false;
     }
-    handle_t h = comp->GetHandle();
-    if(this->mMapOfHandleChannel.find(h)!=mMapOfHandleChannel.end())
+    bool isInstalled = false;
+    if(mSetOfChannel.find(ch)!=mSetOfChannel.end())
     {
-        // has add
-        return true;
+        isInstalled=true;
     }
-    if(!comp->Initialize())
+    if(!isInstalled)
     {
-        return false;
+        if(!ch->Initialize())
+        {
+            return false;
+        }
+        ch->Retain();
+        ch->SetReactor(this);
     }
-    mMapOfHandleChannel.insert(std::make_pair(h,comp));
-    comp->Retain();
-    comp->SetCore(this);
-
-    //kqueue
-    bool ret = false;
-    struct kevent stEvent;
-    //kqueue timer
-    //if(_oChannel.GetTimerInterval()>0)
-    //{
-    //    EV_SET(&stEvent, comp->GetHandle(),EVFILT_TIMER, EV_ADD , 0,_oChannel.GetTimerInterval(), comp);
-    //}
-    //else
-    //{
-    EV_SET(&stEvent, comp->GetHandle(),EVFILT_READ, EV_ADD , 0, 0, comp);
-    //}
-    if(kevent(mCoreHandle, &stEvent, 1, NULL, 0, NULL)>0)
-    {
-        //add to map
-        ret = true;
-    }
-    return ret;
+    RegisterRead(ch);
+    return true;
 }
-bool HKqueueReactor::Unregister(handle_t handle)
+bool HKqueueReactor::Uninstall(handle_t handle)
 {
     if(mRunningFlag<RunningFlag::Initialized)
     {
         return false;
     }
     auto it = this->mMapOfHandleChannel.find(handle);
-    auto comp = it->second;
     if(it==mMapOfHandleChannel.end())
     {
-        // has add
         return true;
     }
+    auto ch = it->second;
     mMapOfHandleChannel.erase(it);
 
-    // kqueue
-    struct kevent evt;
-    //timer check
-    //if(comp->GetTimerInterval()>0)
-    //{
-    //    EV_SET(&evt, comp->GetHandle(),EVFILT_TIMER, EV_DELETE, 0, 0, NULL);
-    //}
-    //else
-    //{
-    EV_SET(&evt, comp->GetHandle(),EVFILT_READ, EV_DELETE, 0, 0, NULL);
-    //}
-    kevent(mCoreHandle, &evt, 1, NULL, 0, NULL);
-    comp->SetCore(nullptr);
-    it->second->Release();
+    UnregisterRead(ch);
+    UnregisterWrite(ch);
+
+    ch->Finish();
+    ch->SetReactor(nullptr);
+    ch->Release();
     return true;
 }
 void HKqueueReactor::Run()
 {
-    cout<<__LINE__<<endl;
     if(mRunningFlag!=RunningFlag::Initialized)
     {
-        cout<<__LINE__<<endl;
         return;
     }
     else
     {
-        cout<<__LINE__<<endl;
         mRunningFlag=RunningFlag::Running;
     }
     int iEpollRet = -1;
-    cout<<__LINE__<<endl;
     while (mRunningFlag == Running)
     {
         struct kevent atmpEvent[10];
-        iEpollRet =kevent(mCoreHandle, NULL, 0, atmpEvent, 10, NULL);
+        iEpollRet =kevent(mKqueueFd, NULL, 0, atmpEvent, 10, NULL);
         if (-1 == iEpollRet)
         {
             if (EINTR == errno)
@@ -146,7 +152,7 @@ void HKqueueReactor::Run()
                 poChannel->TriggerRead();
                 if (true == poChannel->IsNeedClosed())
                 {
-                    this->UnregisterChannel(poChannel->GetHandle());
+                    this->Uninstall(poChannel->GetHandle());
                     break;
                 }
             }
@@ -161,14 +167,15 @@ void HKqueueReactor::Run()
             //        break;
             //    }
             //}
-            //else if (EVFILT_WRITE == atmpEvent[i].filter)
-            //{
-            //    poChannel->FlushOut();
-            //    if (false == poChannel->HasOutput())
-            //    {
-            //        Zinx_ClearChannelOut(*poChannel);
-            //    }
-            //}
+            else if (EVFILT_WRITE == atmpEvent[i].filter)
+            {
+                poChannel->TriggerWrite();
+                if (true == poChannel->IsNeedClosed())
+                {
+                    this->Uninstall(poChannel->GetHandle());
+                    break;
+                }
+            }
         }
     }
 }

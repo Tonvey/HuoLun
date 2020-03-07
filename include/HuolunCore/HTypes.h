@@ -7,7 +7,6 @@ typedef int handle_t;
 #define HUOLUN_IO_STAT_ERR  4
 enum EIOStat
 {
-    None=0,
     In=1,
     Out=2,
     InAndOut=3,

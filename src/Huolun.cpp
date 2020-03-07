@@ -26,12 +26,12 @@ bool Huolun::Finish()
 bool Huolun::RegisterChannel(HIOChannel *comp)
 {
     assert(mReactor);
-    return mReactor->Register(comp);
+    return mReactor->Install(comp);
 }
 bool Huolun::UnregisterChannel(handle_t handle)
 {
     assert(mReactor);
-    return mReactor->Unregister(handle);
+    return mReactor->Uninstall(handle);
 }
 
 void Huolun::Run()

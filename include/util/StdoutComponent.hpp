@@ -1,15 +1,18 @@
 #pragma once
-#include "HComponent.h"
-#include "unistd.h"
+#include "HuolunCore/HComponent.h"
+#include <unistd.h>
 #include <iostream>
 using namespace std;
-class StdInComponent
+class StdoutComponent
     :public HComponent
 {
 public:
+    StdoutComponent()
+    {
+        mHandle = STDOUT_FILENO;
+    }
     virtual bool Initialize()override
     {
-        mHandle = STDIN_FILENO;
         return true;
     }
     virtual bool Finish()override
@@ -18,14 +21,14 @@ public:
     }
     virtual bool OnRead(HBuffer *buffer)override
     {
-        Handle(HMessageHandler::Forward,nullptr);
-        string strBuf;
-        cin>>strBuf;
-        buffer->Append(strBuf);
-        return true;
+        cout<<"Stdout::OnRead"<<endl;
+        return false;
     }
     virtual bool OnWrite(const HBuffer *buffer)override
     {
-        return false;
+        cout<<"OnWrite"<<endl;
+        std::string str(buffer->GetData(),buffer->GetSize());
+        cout<<str<<endl;
+        return true;
     }
 };

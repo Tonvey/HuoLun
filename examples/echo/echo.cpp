@@ -1,5 +1,7 @@
 #include "Huolun.h"
-#include "HuolunCore/StdInComponent.hpp"
+#include "util/StdinComponent.hpp"
+#include "util/StdoutComponent.hpp"
+#include "util/EchoLayer.hpp"
 #include <iostream>
 using namespace std;
 int main()
@@ -10,9 +12,17 @@ int main()
         cerr<<"Huolun init fail"<<endl;
         return -1;
     }
-    auto comp = StdInComponent::Create<StdInComponent>();
-    core.RegisterChannel(comp);
+    auto incomp = HObject::Create<StdinComponent>();
+    auto echoLayer = HObject::Create<EchoLayer>();
+    auto outcomp = HObject::Create<StdoutComponent>();
+    incomp->SetNextHandler(echoLayer);
+    echoLayer->SetDstLayer(outcomp);
+    core.RegisterChannel(incomp);
+    core.RegisterChannel(outcomp);
     core.Run();
     core.Finish();
+    incomp->Release();
+    echoLayer->Release();
+    outcomp->Release();
     return 0;
 }
