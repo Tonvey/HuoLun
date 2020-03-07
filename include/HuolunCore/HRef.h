@@ -7,6 +7,5 @@ public:
     virtual ~HRef();
     void Retain();
     void Release();
-private:
     int mRefCount;
 };

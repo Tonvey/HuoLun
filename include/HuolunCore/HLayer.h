@@ -1,10 +1,11 @@
 #pragma once
-#include "HObject.h"
-#include "HMessage.h"
-class HLayer:public HObject
+#include "HMessageHandler.h"
+class HLayer
+    :virtual public HMessageHandler
 {
 public:
-    HLayer();
-    ~HLayer();
-    virtual HMessage *HandleMsg(HMessage *msg)=0;
+    HLayer(){};
+    ~HLayer(){};
+    virtual HMessage *HandleMessageForward(HMessage *msg)=0;
+    virtual HMessage *HandleMessageBackward(HMessage *msg)=0;
 };

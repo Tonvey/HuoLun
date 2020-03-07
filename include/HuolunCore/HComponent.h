@@ -1,32 +1,29 @@
 #pragma once
-#include "HObject.h"
 #include "HLayer.h"
+#include "HIOChannel.h"
+#include "HBuffer.h"
 #include <list>
-#include <string>
-class HLayer;
+#include <queue>
+class HReactor;
 class HComponent
-    :public HObject
+    :virtual public HLayer
+    ,virtual public HIOChannel
 {
 public:
-    virtual bool Initialize()=0;
-    virtual bool Finish()=0;
-    virtual handle_t GetHandle(){return mHandle;};
-    virtual bool OnRead(std::string &readContent)=0;
-    virtual bool OnWrite(const std::string &writeContent)=0;
-    virtual void OnError(const std::string &error)=0;
-    virtual bool IsNeedClosed(){return mNeedClosed;};
+    virtual bool OnRead(HBuffer *buffer)=0;
+    virtual bool OnWrite(const HBuffer *buffer)=0;
+    virtual HMessage *HandleMessageForward(HMessage *msg)override;
+    virtual HMessage *HandleMessageBackward(HMessage *msg)override;
 public:
     HComponent();
     ~HComponent();
-    bool PushLayerBack(HLayer *layer);
-    bool PushLayerFront(HLayer *layer);
-    HLayer *PopLayerFront();
-    HLayer *PopLayerBack();
-    void ResetQueue();
-    int QueueSize();
+    virtual void TriggerRead()override;
+    virtual void TriggerWrite()override;
+    void PushBufferBack(HBuffer *buf);
+    void PopBufferFront();
+    void ResetBuffer();
 private:
-    std::list<HLayer*> mLayers;
-protected:
-    bool mNeedClosed ;
-    handle_t mHandle;
+    void SetWriteFlag();
+    void ClearWriteFlag();
+    std::list<HBuffer*> mBuffers;
 };

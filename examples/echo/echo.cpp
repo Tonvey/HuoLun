@@ -11,7 +11,7 @@ int main()
         return -1;
     }
     auto comp = StdInComponent::Create<StdInComponent>();
-    core.AddComponent(comp);
+    core.RegisterChannel(comp);
     core.Run();
     core.Finish();
     return 0;

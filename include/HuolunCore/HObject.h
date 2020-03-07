@@ -4,8 +4,11 @@
 class HObject :
     public HRef
 {
-public:
+protected:
     HObject(){}
+    HObject(const HObject &)=delete;
+    HObject(HObject &&)=delete;
+public:
     virtual ~HObject(){}
     template<class T>
     static T *Create()

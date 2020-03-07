@@ -24,10 +24,12 @@ HBuffer::HBuffer(const char *buf, int len)
 }
 HBuffer::HBuffer(const HBuffer &other)
 {
+    assert(&other!=this);
     CopyFrom(other);
 }
 HBuffer::HBuffer(HBuffer &&other)
 {
+    assert(&other!=this);
     MoveFrom(other);
 }
 HBuffer::~HBuffer()
@@ -61,6 +63,7 @@ void HBuffer::Clear()
 }
 void HBuffer::Append(const HBuffer &content)
 {
+    assert(&content!=this);
     if(mReservedSize-mSize<content.GetSize())
     {
         Reallocate(mSize+content.GetSize());
@@ -70,6 +73,7 @@ void HBuffer::Append(const HBuffer &content)
 }
 void HBuffer::Append(const char *buf,int len)
 {
+    assert(buf!=mBuf);
     if(mReservedSize-mSize<len)
     {
         Reallocate(mSize+len);

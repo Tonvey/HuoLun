@@ -4,7 +4,7 @@
 #include <iostream>
 using namespace std;
 class StdInComponent
-    :public  HComponent
+    :public HComponent
 {
 public:
     virtual bool Initialize()override
@@ -16,16 +16,16 @@ public:
     {
         return true;
     }
-    virtual bool OnRead(std::string &readContent)override
+    virtual bool OnRead(HBuffer *buffer)override
     {
-        cin>>readContent;
+        Handle(HMessageHandler::Forward,nullptr);
+        string strBuf;
+        cin>>strBuf;
+        buffer->Append(strBuf);
         return true;
     }
-    virtual bool OnWrite(const std::string &writeContent)override
+    virtual bool OnWrite(const HBuffer *buffer)override
     {
         return false;
-    }
-    virtual void OnError(const std::string &error)override
-    {
     }
 };

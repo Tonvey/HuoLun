@@ -1,52 +1,80 @@
 #include "HuolunCore/HComponent.h"
 #include "HuolunCore/HLayer.h"
+#include "HuolunCore/Reactor/HReactor.h"
 
 HComponent::HComponent()
 {
-    mNeedClosed = false;
 }
 HComponent::~HComponent()
 {
-    ResetQueue();
+    ResetBuffer();
 }
-bool HComponent::PushLayerBack(HLayer *layer)
+void HComponent::PushBufferBack(HBuffer *buf)
 {
-    assert(layer);
-    layer->Retain();
-    mLayers.push_back(layer);
-    return true;
+    assert(buf);
+    buf->Retain();
+    mBuffers.push_back(buf);
+    SetWriteFlag();
 }
-bool HComponent::PushLayerFront(HLayer *layer)
+void HComponent::PopBufferFront()
 {
-    assert(layer);
-    layer->Retain();
-    mLayers.push_front(layer);
-    return true;
+    auto element = mBuffers.front();
+    mBuffers.pop_front();
+    element->Release();
+    SetWriteFlag();
 }
-HLayer *HComponent::PopLayerFront()
+void HComponent::ResetBuffer()
 {
-    auto ret = mLayers.front();
-    mLayers.pop_front();
-    //TODO : need release ?
-    ret->Release();
-    return ret;
-}
-HLayer *HComponent::PopLayerBack()
-{
-    auto ret = mLayers.back();
-    mLayers.pop_back();
-    ret->Release();
-    return ret;
-}
-void HComponent::ResetQueue()
-{
-    for(auto i : mLayers)
+    for(auto i : mBuffers)
     {
         i->Release();
     }
-    mLayers.clear();
+    mBuffers.clear();
 }
-int HComponent::QueueSize()
+void HComponent::TriggerRead()
 {
-    return mLayers.size();
+    Handle(HandleDirection::Forward,nullptr);
+}
+void HComponent::SetWriteFlag()
+{
+}
+void HComponent::ClearWriteFlag()
+{
+}
+void HComponent::TriggerWrite()
+{
+    while(mBuffers.size()>0)
+    {
+        auto buf = mBuffers.front();
+        if(OnWrite(buf))
+        {
+            PopBufferFront();
+        }
+        else
+        {
+            break;
+        }
+    }
+    if(mBuffers.size()==0)
+    {
+        ClearWriteFlag();
+    }
+}
+HMessage *HComponent::HandleMessageForward(HMessage *msg)
+{
+    HBytesMessage *ret = Create<HBytesMessage>();
+    if(!OnRead(ret->GetBytes()))
+    {
+        ret->Release();
+    }
+    return ret;
+}
+HMessage *HComponent::HandleMessageBackward(HMessage *msg)
+{
+    auto bytes = dynamic_cast<HBytesMessage*>(msg);
+    if(bytes!=nullptr)
+    {
+        PushBufferBack(bytes->GetBytes());
+    }
+    return nullptr;
 }
