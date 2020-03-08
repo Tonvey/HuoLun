@@ -7,7 +7,6 @@
 #include <sys/epoll.h>
 HEpollReactor::HEpollReactor()
 {
-    mRunningFlag = Created;
 }
 HEpollReactor::~HEpollReactor()
 {
@@ -16,11 +15,11 @@ HEpollReactor::~HEpollReactor()
 }
 bool HEpollReactor::Initialize()
 {
-    HReactor::Initialized();
+    HReactor::Initialize();
     mEpfd = epoll_create(1);
     return mEpfd>=0;
 }
-bool HEpollReactor::Finish()
+void HEpollReactor::Finish()
 {
     HReactor::Finish();
     if(mEpfd>=0)
@@ -28,7 +27,6 @@ bool HEpollReactor::Finish()
         close(mEpfd);
         mEpfd=-1;
     }
-    return true;
 }
 bool HEpollReactor::RegisterReadImpl(HIOChannel *ch)
 {
@@ -80,14 +78,7 @@ bool HEpollReactor::EpollCtl(HIOChannel *ch,int op ,int events)
 }
 void HEpollReactor::Run()
 {
-    if(mRunningFlag!=RunningFlag::Initialized)
-    {
-        return;
-    }
-    else
-    {
-        mRunningFlag=RunningFlag::Running;
-    }
+    mRunningFlag=RunningFlag::Running;
     int iEpollRet = -1;
     while (mRunningFlag == Running)
     {

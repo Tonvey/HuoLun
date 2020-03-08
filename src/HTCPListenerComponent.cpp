@@ -1,6 +1,7 @@
 #include "HuolunCore/Reactor/HReactor.h"
 #include "HuolunCore/HTCPListenerComponent.h"
 #include "HuolunCore/HTCPDataComponent.h"
+#include <cstring>
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>

@@ -9,7 +9,7 @@ public:
     HEpollReactor();
     ~HEpollReactor();
     virtual bool Initialize()override;
-    virtual bool Finish()override;
+    virtual void Finish()override;
     virtual void Run()override;
     virtual void Stop()override;
 protected:
