@@ -34,7 +34,7 @@ protected:
         Initialized,
         Running,
     } mRunningFlag=Created;
-private:
+protected:
     std::map<handle_t,HIOChannel*> mMapOfHandleChannel;
     std::set<HIOChannel*> mSetOfChannel;
 };

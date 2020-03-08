@@ -1,5 +1,6 @@
 #pragma once
 #include "HReactor.h"
+#include "HuolunCore/HPlatform.h"
 #include <string>
 class HComponent;
 class HReactorFactory

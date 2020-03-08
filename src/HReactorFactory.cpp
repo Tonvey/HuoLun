@@ -2,6 +2,7 @@
 #include "HuolunCore/Reactor/HReactorFactory.h"
 #include "HuolunCore/Reactor/HKqueueReactor.h"
 #include "HuolunCore/Reactor/HEpollReactor.h"
+#include "HuolunCore/Reactor/HSelectReactor.h"
 HReactor *HReactorFactory::CreateReactor()
 {
 #if defined(__HUOLUN_KQUEUE__)
@@ -44,17 +45,17 @@ HReactorFactory *HReactorFactory::GetFactory(ReactorType type)
         break;
 #endif
 #if defined(__HUOLUN_SELECT__)
-    case EPOLL:
+    case SELECT:
         ret = Create<HSelectReactorFactory>();
         break;
 #endif
 #if defined(__HUOLUN_POLL__)
-    case EPOLL:
+    case POLL:
         ret = Create<HPollReactorFactory>();
         break;
 #endif
 #if defined(__HUOLUN_IOCP__)
-    case EPOLL:
+    case IOCP:
         ret = Create<HIOCPReactorFactory>();
         break;
 #endif
