@@ -21,5 +21,8 @@ public:
         return nullptr;
     }
 private:
+    using HLayer::SetNextHandler;
+    using HLayer::SetPrevHandler;
+private:
     HLayer *dst=nullptr;
 };

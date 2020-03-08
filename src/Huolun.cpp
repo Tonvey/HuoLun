@@ -19,10 +19,10 @@ bool Huolun::Initialize()
     assert(mReactor);
     return mReactor->Initialize();
 }
-bool Huolun::Finish()
+void Huolun::Finish()
 {
     assert(mReactor);
-    return mReactor->Finish();
+    mReactor->Finish();
 }
 bool Huolun::RegisterChannel(HIOChannel *comp)
 {

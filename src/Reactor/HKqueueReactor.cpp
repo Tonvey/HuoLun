@@ -6,7 +6,6 @@
 #include <sys/event.h>
 HKqueueReactor::HKqueueReactor()
 {
-    mRunningFlag = Created;
 }
 HKqueueReactor::~HKqueueReactor()
 {
@@ -15,32 +14,18 @@ HKqueueReactor::~HKqueueReactor()
 }
 bool HKqueueReactor::Initialize()
 {
-    if(mRunningFlag== RunningFlag::Created)
-    {
-        mKqueueFd = kqueue();
-        mRunningFlag = RunningFlag::Initialized;
-    }
+    HReactor::Initialize();
+    mKqueueFd = kqueue();
     return mKqueueFd>=0;
 }
-bool HKqueueReactor::Finish()
+void HKqueueReactor::Finish()
 {
-    if(mRunningFlag==RunningFlag::Running)
-    {
-        return false;
-    }
-    for (auto itr : mMapOfHandleChannel)
-    {
-        auto ch = itr.second;
-        ch->Finish();
-    }
-    mMapOfHandleChannel.clear();
+    HReactor::Finish();
     if(mKqueueFd>=0)
     {
         close(mKqueueFd);
         mKqueueFd=-1;
     }
-    mRunningFlag = RunningFlag::Created;
-    return true;
 }
 bool HKqueueReactor::RegisterReadImpl(HIOChannel *ch)
 {
@@ -73,61 +58,9 @@ bool HKqueueReactor::KqueueModFilter(HIOChannel *ch,int filter,int flag)
     }
     return ret;
 }
-bool HKqueueReactor::Install(HIOChannel *ch)
-{
-    if(mRunningFlag<RunningFlag::Initialized)
-    {
-        return false;
-    }
-    bool isInstalled = false;
-    if(mSetOfChannel.find(ch)!=mSetOfChannel.end())
-    {
-        isInstalled=true;
-    }
-    if(!isInstalled)
-    {
-        if(!ch->Initialize())
-        {
-            return false;
-        }
-        ch->Retain();
-        ch->SetReactor(this);
-    }
-    RegisterRead(ch);
-    return true;
-}
-bool HKqueueReactor::Uninstall(handle_t handle)
-{
-    if(mRunningFlag<RunningFlag::Initialized)
-    {
-        return false;
-    }
-    auto it = this->mMapOfHandleChannel.find(handle);
-    if(it==mMapOfHandleChannel.end())
-    {
-        return true;
-    }
-    auto ch = it->second;
-    mMapOfHandleChannel.erase(it);
-
-    UnregisterRead(ch);
-    UnregisterWrite(ch);
-
-    ch->Finish();
-    ch->SetReactor(nullptr);
-    ch->Release();
-    return true;
-}
 void HKqueueReactor::Run()
 {
-    if(mRunningFlag!=RunningFlag::Initialized)
-    {
-        return;
-    }
-    else
-    {
-        mRunningFlag=RunningFlag::Running;
-    }
+    mRunningFlag=RunningFlag::Running;
     int iEpollRet = -1;
     while (mRunningFlag == Running)
     {

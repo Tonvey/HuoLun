@@ -17,10 +17,6 @@ public:
         mHandle = STDIN_FILENO;
         return true;
     }
-    virtual bool Finish()override
-    {
-        return true;
-    }
     virtual bool OnRead(HBuffer *buffer)override
     {
         string strBuf;

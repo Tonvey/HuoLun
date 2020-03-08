@@ -17,10 +17,6 @@ public:
         mHandle = STDOUT_FILENO;
         return true;
     }
-    virtual bool Finish()override
-    {
-        return true;
-    }
     virtual bool OnRead(HBuffer *buffer)override
     {
         return false;

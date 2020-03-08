@@ -1,3 +1,4 @@
+#include "HuolunCore/Reactor/HReactor.h"
 #include "HuolunCore/Reactor/HEpollReactor.h"
 #include "HuolunCore/HIOChannel.h"
 #ifdef __HUOLUN_PLATFORM_LINUX__
@@ -15,31 +16,18 @@ HEpollReactor::~HEpollReactor()
 }
 bool HEpollReactor::Initialize()
 {
-    if(mRunningFlag== RunningFlag::Created)
-    {
-        mEpfd = epoll_create(1);
-        mRunningFlag = RunningFlag::Initialized;
-    }
+    HReactor::Initialized();
+    mEpfd = epoll_create(1);
     return mEpfd>=0;
 }
 bool HEpollReactor::Finish()
 {
-    if(mRunningFlag==RunningFlag::Running)
-    {
-        return false;
-    }
-    for (auto itr : mMapOfHandleChannel)
-    {
-        auto ch = itr.second;
-        ch->Finish();
-    }
-    mMapOfHandleChannel.clear();
+    HReactor::Finish();
     if(mEpfd>=0)
     {
         close(mEpfd);
         mEpfd=-1;
     }
-    mRunningFlag = RunningFlag::Created;
     return true;
 }
 bool HEpollReactor::RegisterReadImpl(HIOChannel *ch)
@@ -89,51 +77,6 @@ bool HEpollReactor::EpollCtl(HIOChannel *ch,int op ,int events)
         ret = true;
     }
     return ret;
-}
-bool HEpollReactor::Install(HIOChannel *ch)
-{
-    if(mRunningFlag<RunningFlag::Initialized)
-    {
-        return false;
-    }
-    bool isInstalled = false;
-    if(mSetOfChannel.find(ch)!=mSetOfChannel.end())
-    {
-        isInstalled=true;
-    }
-    if(!isInstalled)
-    {
-        if(!ch->Initialize())
-        {
-            return false;
-        }
-        ch->Retain();
-        ch->SetReactor(this);
-    }
-    RegisterRead(ch);
-    return true;
-}
-bool HEpollReactor::Uninstall(handle_t handle)
-{
-    if(mRunningFlag<RunningFlag::Initialized)
-    {
-        return false;
-    }
-    auto it = this->mMapOfHandleChannel.find(handle);
-    if(it==mMapOfHandleChannel.end())
-    {
-        return true;
-    }
-    auto ch = it->second;
-    mMapOfHandleChannel.erase(it);
-
-    UnregisterRead(ch);
-    UnregisterWrite(ch);
-
-    ch->Finish();
-    ch->SetReactor(nullptr);
-    ch->Release();
-    return true;
 }
 void HEpollReactor::Run()
 {

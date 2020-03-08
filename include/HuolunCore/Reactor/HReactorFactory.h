@@ -1,6 +1,7 @@
 #pragma once
 #include "HReactor.h"
 #include <string>
+class HComponent;
 class HReactorFactory
     :public HObject
 {

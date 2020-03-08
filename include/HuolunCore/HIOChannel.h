@@ -9,9 +9,9 @@ class HIOChannel
 public:
     friend HReactor;
     //Initialize object and create the fd/handle here
-    virtual bool Initialize()=0;
+    virtual bool Initialize();
     //Call when unregister from reactor core , destroy fd/handle here
-    virtual bool Finish()=0;
+    virtual void Finish();
     virtual void TriggerRead()=0;
     virtual void TriggerWrite()=0;
     virtual handle_t GetHandle()const{return mHandle;};
