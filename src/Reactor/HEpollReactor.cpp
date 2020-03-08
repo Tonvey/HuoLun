@@ -126,6 +126,6 @@ void HEpollReactor::Stop()
 }
 HReactor *HEpollReactorFactory::CreateReactor()
 {
-    return Create<HKqueueReactor>();
+    return Create<HEpollReactor>();
 }
 #endif

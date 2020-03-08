@@ -2,6 +2,7 @@
 #include "HuolunCore/HPlatform.h"
 #ifdef __HUOLUN_PLATFORM_LINUX__
 #include "HReactor.h"
+#include "HReactorFactory.h"
 class HEpollReactor
     :public HReactor
 {
