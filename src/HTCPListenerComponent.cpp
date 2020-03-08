@@ -5,9 +5,6 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <iostream>
-using std::cout;
-using std::endl;
 HTCPListenerComponent::HTCPListenerComponent(uint16_t port , HLayerFactory *fact)
 {
     if(fact)
@@ -40,13 +37,11 @@ bool HTCPListenerComponent::OnRead(HBuffer *buffer)
     fd = accept(GetHandle(), (struct sockaddr *)&stClientAddr, &lAddrLen);
     if (0 <= fd)
     {
-        cout<<"New connection ..."<<endl;
         //TODO ip
         auto poTcpDataChannel = Create<HTCPDataComponent>(fd,ipv4_t{0},ntohs(stClientAddr.sin_port));
         auto layer = mLayerFact->CreateLayer(poTcpDataChannel);
         poTcpDataChannel->SetNextHandler(layer);
         mReactor->Install(poTcpDataChannel);
-        cout<<"install data comp ..."<<endl;
         ret = true;
     }
     else

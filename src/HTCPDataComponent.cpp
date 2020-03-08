@@ -3,9 +3,6 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <unistd.h>
-#include <iostream>
-using std::cout;
-using std::endl;
 HTCPDataComponent::HTCPDataComponent(handle_t handle,std::array<uint8_t,4> ip,uint16_t port)
     :mDestIp(ip)
     ,mDestPort(port)
@@ -18,7 +15,6 @@ HTCPDataComponent::~HTCPDataComponent()
 }
 bool HTCPDataComponent::OnRead(HBuffer *buffer)
 {
-    cout<<"Data on read"<<endl;
     bool bRet = false;
     ssize_t iReadLen = -1;
     char aucBuff[1024] = {0};

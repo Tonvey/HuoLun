@@ -4,6 +4,7 @@
 #include "util/EchoLayer.hpp"
 #include <iostream>
 using namespace std;
+//Factory create the next layer of new socket data component
 class MyLayerFactory
     :public HLayerFactory
 {
@@ -15,8 +16,19 @@ public:
         return echo;
     }
 };
-int main()
+void usage(std::string argv0)
 {
+    cerr<<"Usage : "<<argv0<<" <bind port>"<<endl;
+}
+int main(int argc, char **argv)
+{
+    if(argc!=2)
+    {
+        usage(argv[0]);
+        return -1;
+    }
+    uint16_t port=8899;
+    port = std::atoi(argv[1]);
     Huolun core;
     if(!core.Initialize())
     {
@@ -24,7 +36,7 @@ int main()
         return -1;
     }
     auto fact = CreateObject<MyLayerFactory>();
-    auto listen = CreateObject<HTCPListenerComponent>(8899,fact);
+    auto listen = CreateObject<HTCPListenerComponent>(port,fact);
     core.RegisterChannel(listen);
     fact->Release();
     listen->Release();
