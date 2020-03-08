@@ -124,4 +124,8 @@ void HEpollReactor::Stop()
 {
     mRunningFlag = RunningFlag::Initialized;
 }
+HReactor *HEpollReactorFactory::CreateReactor()
+{
+    return Create<HKqueueReactor>();
+}
 #endif

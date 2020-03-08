@@ -2,6 +2,7 @@
 #include "HuolunCore/HPlatform.h"
 #ifdef __HUOLUN_PLATFORM_APPLE__
 #include "HReactor.h"
+#include "HReactorFactory.h"
 class HKqueueReactor
     :public HReactor
 {
@@ -20,5 +21,11 @@ protected:
     bool KqueueModFilter(HIOChannel *ch,int filter,int flag);
 private:
     int mKqueueFd = -1;
+};
+class HKqueueReactorFactory
+    :public HReactorFactory
+{
+public:
+    virtual HReactor *CreateReactor()override;
 };
 #endif

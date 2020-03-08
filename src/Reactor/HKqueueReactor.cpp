@@ -116,4 +116,8 @@ void HKqueueReactor::Stop()
 {
     mRunningFlag = RunningFlag::Initialized;
 }
+HReactor *HKqueueReactorFactory::CreateReactor()
+{
+    return Create<HKqueueReactor>();
+}
 #endif

@@ -21,4 +21,10 @@ protected:
 private:
     int mEpfd = -1;
 };
+class HEpollReactorFactory
+    :public HReactorFactory
+{
+public:
+    virtual HReactor *CreateReactor()override;
+};
 #endif

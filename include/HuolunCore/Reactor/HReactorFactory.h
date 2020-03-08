@@ -8,12 +8,27 @@ class HReactorFactory
 public:
     enum ReactorType
     {
+        None,
+#ifdef __HUOLUN_SELECT__
         SELECT,
+#endif
+#ifdef __HUOLUN_POLL__
         POLL,
+#endif
+#ifdef __HUOLUN_EPOLL__
         EPOLL,
+#endif
+#ifdef __HUOLUN_KQUEUE__
         KQUEUE,
+#endif
+#ifdef __HUOLUN_IOCP__
         IOCP
+#endif
     };
-    static HReactor *CreateReactor(std::string &errStr);
-    static HReactor *CreateReactor(ReactorType type,std::string &errStr);
+    virtual HReactor *CreateReactor()=0;
+public:
+    static HReactorFactory *GetFactory();
+    static HReactorFactory *GetFactory(ReactorType type);
+private:
+    ReactorType mType;
 };

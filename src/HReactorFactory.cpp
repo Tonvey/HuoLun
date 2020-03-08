@@ -2,20 +2,64 @@
 #include "HuolunCore/Reactor/HReactorFactory.h"
 #include "HuolunCore/Reactor/HKqueueReactor.h"
 #include "HuolunCore/Reactor/HEpollReactor.h"
-
-HReactor *HReactorFactory::CreateReactor(std::string &errStr)
+HReactor *HReactorFactory::CreateReactor()
 {
 #if defined(__HUOLUN_KQUEUE__)
     return Create<HKqueueReactor>();
 #elif defined(__HUOLUN_EPOLL__) 
     return Create<HEpollReactor>();
 #endif
-    errStr = "Unknowed Platform";
-    return nullptr;
-}
-HReactor *HReactorFactory::CreateReactor(HReactorFactory::ReactorType type,std::string &errStr)
-{
-    errStr = "Unknowed Platform";
     return nullptr;
 }
 
+HReactorFactory *HReactorFactory::GetFactory()
+{
+    ReactorType type=None;
+#if defined(__HUOLUN_KQUEUE__)
+    type=KQUEUE;
+#elif defined(__HUOLUN_EPOLL__)
+    type=EPOLL;
+#elif defined(__HUOLUN_IOCP__)
+    type=IOCP;
+#elif defined(__HUOLUN_SELECT__)
+    type=SELECT;
+#elif defined(__HUOLUN_POLL__)
+    type=POLL;
+#endif
+    return GetFactory(type);
+}
+HReactorFactory *HReactorFactory::GetFactory(ReactorType type)
+{
+    HReactorFactory *ret=nullptr;
+    switch(type)
+    {
+#if defined(__HUOLUN_KQUEUE__)
+    case KQUEUE:
+        ret = Create<HKqueueReactorFactory>();
+        break;
+#endif
+#if defined(__HUOLUN_EPOLL__)
+    case EPOLL:
+        ret = Create<HEpollReactorFactory>();
+        break;
+#endif
+#if defined(__HUOLUN_SELECT__)
+    case EPOLL:
+        ret = Create<HSelectReactorFactory>();
+        break;
+#endif
+#if defined(__HUOLUN_POLL__)
+    case EPOLL:
+        ret = Create<HPollReactorFactory>();
+        break;
+#endif
+#if defined(__HUOLUN_IOCP__)
+    case EPOLL:
+        ret = Create<HIOCPReactorFactory>();
+        break;
+#endif
+    default:
+        break;
+    }
+    return ret;
+}

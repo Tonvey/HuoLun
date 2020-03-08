@@ -7,7 +7,8 @@ using namespace std;
 Huolun::Huolun()
 {
     std::string errBuf;
-    mReactor = HReactorFactory::CreateReactor(errBuf);
+    auto fact = HReactorFactory::GetFactory();
+    mReactor = fact->CreateReactor();
     assert(mReactor);
 }
 Huolun::~Huolun()
