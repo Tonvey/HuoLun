@@ -1,18 +1,20 @@
 #pragma once
 #include "HuolunCore/HComponent.h"
-#include <unistd.h>
 #include <iostream>
 using namespace std;
+#ifndef STDIN_FILENO
+#define STDIN_FILENO 0
+#endif
 class StdinComponent
     :public HComponent
 {
 public:
     StdinComponent()
     {
-        mHandle = STDIN_FILENO;
     }
     virtual bool Initialize()override
     {
+        mHandle = STDIN_FILENO;
         return true;
     }
     virtual bool Finish()override

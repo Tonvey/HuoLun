@@ -1,5 +1,6 @@
 #pragma once
-#include "HBuffer.h"
+#include "HObject.h"
+class HBuffer;
 class HMessage
     :public HObject
 {
@@ -9,17 +10,8 @@ class HBytesMessage
     :public HMessage
 {
 public:
-    HBytesMessage()
-    {
-        mBytes = Create<HBuffer>();
-    }
-    ~HBytesMessage()
-    {
-        if(mBytes)
-        {
-            mBytes->Release();
-        }
-    }
+    HBytesMessage();
+    ~HBytesMessage();
     HBuffer *GetBytes()const {return mBytes;}
 private:
     HBuffer *mBytes;

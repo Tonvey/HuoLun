@@ -1,18 +1,20 @@
 #pragma once
 #include "HuolunCore/HComponent.h"
-#include <unistd.h>
 #include <iostream>
 using namespace std;
+#ifndef STDOUT_FILENO
+#define STDOUT_FILENO 1
+#endif
 class StdoutComponent
     :public HComponent
 {
 public:
     StdoutComponent()
     {
-        mHandle = STDOUT_FILENO;
     }
     virtual bool Initialize()override
     {
+        mHandle = STDOUT_FILENO;
         return true;
     }
     virtual bool Finish()override

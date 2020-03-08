@@ -1,10 +1,9 @@
 #pragma once
 #include "HLayer.h"
 #include "HIOChannel.h"
-#include "HBuffer.h"
 #include <list>
-#include <queue>
 class HReactor;
+class HBuffer;
 class HComponent
     :virtual public HLayer
     ,virtual public HIOChannel
