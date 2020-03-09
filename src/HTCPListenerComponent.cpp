@@ -2,9 +2,12 @@
 #include "HuolunCore/HTCPListenerComponent.h"
 #include "HuolunCore/HTCPDataComponent.h"
 #include <cstring>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <unistd.h>
+#ifdef __HUOLUN_PLATFORM_WIN__
+#include<WS2tcpip.h>
+#else
+#   include <arpa/inet.h>
+#   include <netinet/in.h>
+#endif
 HTCPListenerComponent::HTCPListenerComponent(uint16_t port , HLayerFactory *fact)
 {
     if(fact)
@@ -30,15 +33,15 @@ HTCPListenerComponent::~HTCPListenerComponent()
 bool HTCPListenerComponent::OnRead(HBuffer *buffer)
 {
     bool ret = false;
-    int fd = -1;
+    socket_handle_t fd = -1;
     struct sockaddr_in stClientAddr;
     //TODO bind address use mip
     socklen_t lAddrLen = sizeof(stClientAddr);
-    fd = accept(GetHandle(), (struct sockaddr *)&stClientAddr, &lAddrLen);
+    fd = accept(socket_handle_t(GetHandle()), (struct sockaddr *)&stClientAddr, &lAddrLen);
     if (0 <= fd)
     {
         //TODO ip
-        auto poTcpDataChannel = Create<HTCPDataComponent>(fd,ipv4_t{0},ntohs(stClientAddr.sin_port));
+        auto poTcpDataChannel = Create<HTCPDataComponent>(reactor_handle_t(fd),ipv4_t{0},ntohs(stClientAddr.sin_port));
         auto layer = mLayerFact->CreateLayer(poTcpDataChannel);
         poTcpDataChannel->SetNextHandler(layer);
         mReactor->Install(poTcpDataChannel);
@@ -57,7 +60,7 @@ bool HTCPListenerComponent::OnWrite(const HBuffer *buffer)
 bool HTCPListenerComponent::Initialize()
 {
     bool ret = false;
-    int iListenFd = -1;
+    socket_handle_t iListenFd = socket_handle_t(HUOLUN_INVALID_HANDLE);
     struct sockaddr_in stServaddr;
 
     iListenFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -69,13 +72,13 @@ bool HTCPListenerComponent::Initialize()
         stServaddr.sin_port = htons(mPort);
 
         int opt = 1;
-        setsockopt(iListenFd, SOL_SOCKET, SO_REUSEADDR,  (void *)&opt, sizeof(opt));
+        setsockopt(iListenFd, SOL_SOCKET, SO_REUSEADDR,  (char*)&opt, sizeof(opt));
         if (0 == bind(iListenFd, (struct sockaddr *)&stServaddr, sizeof(stServaddr)))
         {
             if (0 == listen(iListenFd, 10))
             {
                 ret = true;
-                mHandle = iListenFd;
+                mHandle = reactor_handle_t(iListenFd);
             }
             else
             {
@@ -97,7 +100,11 @@ void HTCPListenerComponent::Finish()
 {
     if (0 <= mHandle)
     {
+#ifdef __HUOLUN_PLATFORM_WIN__
+        closesocket(socket_handle_t(mHandle));
+#else
         close(mHandle);
-        mHandle = -1;
+#endif
+        mHandle = HUOLUN_INVALID_HANDLE;
     }
 }

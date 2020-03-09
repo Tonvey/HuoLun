@@ -21,7 +21,7 @@ protected:
     virtual bool UnregisterWriteImpl(HIOChannel *ch)=0;
 public:
     bool Install(HIOChannel *ch);
-    bool Uninstall(handle_t handle);
+    bool Uninstall(reactor_handle_t handle);
     bool Uninstall(HIOChannel *ch);
     bool RegisterRead(HIOChannel *ch);
     bool RegisterWrite(HIOChannel *ch);
@@ -35,6 +35,6 @@ protected:
         Running,
     } mRunningFlag=Created;
 protected:
-    std::map<handle_t,HIOChannel*> mMapOfHandleChannel;
+    std::map<reactor_handle_t,HIOChannel*> mMapOfHandleChannel;
     std::set<HIOChannel*> mSetOfChannel;
 };

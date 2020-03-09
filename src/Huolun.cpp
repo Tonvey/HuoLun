@@ -30,7 +30,7 @@ bool Huolun::RegisterChannel(HIOChannel *comp)
     assert(mReactor);
     return mReactor->Install(comp);
 }
-bool Huolun::UnregisterChannel(handle_t handle)
+bool Huolun::UnregisterChannel(reactor_handle_t handle)
 {
     assert(mReactor);
     return mReactor->Uninstall(handle);

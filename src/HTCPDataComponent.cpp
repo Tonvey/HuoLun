@@ -1,9 +1,13 @@
+#include "HuolunCore/HPlatform.h"
 #include "HuolunCore/Reactor/HReactor.h"
 #include "HuolunCore/HTCPDataComponent.h"
+#ifdef __HUOLUN_PLATFORM_WIN__
+#include <winsock2.h>
+#else
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include <unistd.h>
-HTCPDataComponent::HTCPDataComponent(handle_t handle,std::array<uint8_t,4> ip,uint16_t port)
+#endif
+HTCPDataComponent::HTCPDataComponent(reactor_handle_t handle,std::array<uint8_t,4> ip,uint16_t port)
     :mDestIp(ip)
     ,mDestPort(port)
 {
@@ -16,9 +20,9 @@ HTCPDataComponent::~HTCPDataComponent()
 bool HTCPDataComponent::OnRead(HBuffer *buffer)
 {
     bool bRet = false;
-    ssize_t iReadLen = -1;
+    size_t iReadLen = -1;
     char aucBuff[1024] = {0};
-    while (0 < (iReadLen = recv(GetHandle(), aucBuff, sizeof(aucBuff), MSG_DONTWAIT)))
+    while (0 < (iReadLen = recv(socket_handle_t(GetHandle()), aucBuff, sizeof(aucBuff),0)))
     {
         buffer->Append(aucBuff,iReadLen);
         bRet = true;
@@ -32,7 +36,7 @@ bool HTCPDataComponent::OnRead(HBuffer *buffer)
 bool HTCPDataComponent::OnWrite(const HBuffer *buffer)
 {
     bool bRet = false;
-    if ((0 <= GetHandle()) && (buffer->GetSize() == send(GetHandle(), buffer->GetData(), buffer->GetSize(), 0)))
+    if ((0 <= GetHandle()) && (buffer->GetSize() == send(socket_handle_t(GetHandle()), buffer->GetData(), buffer->GetSize(), 0)))
     {
         bRet = true;
     }
@@ -40,13 +44,26 @@ bool HTCPDataComponent::OnWrite(const HBuffer *buffer)
 }
 bool HTCPDataComponent::Initialize()
 {
+#ifdef UNIX  
+    int on=1;  
+    if (ioctlsocket(id, FIONBIO, (char *)&on) < 0)  
+#endif  
+              
+#ifdef WIN32  
+    unsigned long on_windows=1;  
+    if (ioctlsocket(socket_handle_t(mHandle), FIONBIO, &on_windows) < 0)  
+#endif  
     return true;
 }
 void HTCPDataComponent::Finish()
 {
     if (0 <= mHandle)
     {
+#ifdef __HUOLUN_PLATFORM_WIN__
+        closesocket(socket_handle_t(mHandle));
+#else
         close(mHandle);
-        mHandle = -1;
+#endif
+        mHandle = HUOLUN_INVALID_HANDLE;
     }
 }

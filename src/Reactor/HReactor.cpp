@@ -84,7 +84,7 @@ bool HReactor::Install(HIOChannel *ch)
     RegisterRead(ch);
     return isInstalled;
 }
-bool HReactor::Uninstall(handle_t handle)
+bool HReactor::Uninstall(reactor_handle_t handle)
 {
     auto it = this->mMapOfHandleChannel.find(handle);
     if(it==mMapOfHandleChannel.end())

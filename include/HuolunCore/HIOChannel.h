@@ -14,14 +14,14 @@ public:
     virtual void Finish();
     virtual void TriggerRead()=0;
     virtual void TriggerWrite()=0;
-    virtual handle_t GetHandle()const{return mHandle;};
+    virtual reactor_handle_t GetHandle()const{return mHandle;};
     virtual bool IsNeedClosed(){return mNeedClosed;};
     void SetClosed(bool val){mNeedClosed = val;};
     void SetReactor(HReactor *reactor){mReactor = reactor;}
     EIOStat GetIOStat()const{return mIOStat;}
     void SetIOStat(EIOStat stat){mIOStat=stat;}
 protected:
-    handle_t mHandle=-1;
+    reactor_handle_t mHandle = HUOLUN_INVALID_HANDLE;
     HReactor *mReactor=nullptr;
 private:
     bool mNeedClosed = false;

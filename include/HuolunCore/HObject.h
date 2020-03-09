@@ -24,6 +24,10 @@ private:
     {
         return ::operator new(size);
     }
+    void *operator new[](size_t size)
+    {
+        return ::operator new[](size);
+    }
 };
 template<class T,class ... Args>
 T *CreateObject(Args... args)

@@ -1,36 +1,33 @@
-#include "HuolunCore/Reactor/HSelectReactor.h"
+#include "HuolunCore/Reactor/HIOCPReactor.h"
+#ifdef __HUOLUN_IOCP__
 #include "HuolunCore/HIOChannel.h"
-#ifndef __HUOLUN_PLATFORM_WIN__
-#   include <sys/errno.h>
-#   include <sys/select.h>
-#endif
 #include <list>
 #include <iostream>
-HSelectReactor::HSelectReactor()
+HIOCPReactor::HIOCPReactor()
 {
 }
-HSelectReactor::~HSelectReactor()
+HIOCPReactor::~HIOCPReactor()
 {
     Stop();
     Finish();
 }
-bool HSelectReactor::RegisterReadImpl(HIOChannel *ch)
+bool HIOCPReactor::RegisterReadImpl(HIOChannel *ch)
 {
     return true;
 }
-bool HSelectReactor::UnregisterReadImpl(HIOChannel *ch)
+bool HIOCPReactor::UnregisterReadImpl(HIOChannel *ch)
 {
     return true;
 }
-bool HSelectReactor::RegisterWriteImpl(HIOChannel *ch)
+bool HIOCPReactor::RegisterWriteImpl(HIOChannel *ch)
 {
     return true;
 }
-bool HSelectReactor::UnregisterWriteImpl(HIOChannel *ch)
+bool HIOCPReactor::UnregisterWriteImpl(HIOChannel *ch)
 {
     return true;
 }
-void HSelectReactor::Run()
+void HIOCPReactor::Run()
 {
     mRunningFlag=RunningFlag::Running;
     fd_set rset,wset;
@@ -91,11 +88,12 @@ void HSelectReactor::Run()
         }
     }
 }
-void HSelectReactor::Stop()
+void HIOCPReactor::Stop()
 {
     mRunningFlag = RunningFlag::Initialized;
 }
-HReactor *HSelectReactorFactory::CreateReactor()
+HReactor *HIOCPReactorFactory::CreateReactor()
 {
-    return Create<HSelectReactor>();
+    return Create<HIOCPReactor>();
 }
+#endif

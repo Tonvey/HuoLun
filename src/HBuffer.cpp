@@ -1,6 +1,7 @@
 #include "HuolunCore/HBuffer.h"
 #include <cstring>
 #include <cassert>
+#include <algorithm>
 HBuffer::HBuffer()
 {
 }
@@ -47,6 +48,9 @@ void HBuffer::Reallocate(size_t newSize)
     mReservedSize = newSize;
     if(mBuf!=nullptr)
     {
+#ifdef min
+#undef min
+#endif
         mSize = std::min(newSize,mSize);
         memcpy(buf,mBuf,mSize);
         delete [] mBuf;

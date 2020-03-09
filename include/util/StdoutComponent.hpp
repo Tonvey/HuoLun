@@ -3,7 +3,7 @@
 #include <iostream>
 using namespace std;
 #ifndef STDOUT_FILENO
-#define STDOUT_FILENO 1
+#define STDOUT_FILENO reactor_handle_t(1)
 #endif
 class StdoutComponent
     :public HComponent

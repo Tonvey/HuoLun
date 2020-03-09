@@ -8,7 +8,7 @@ class HTCPDataComponent
 public:
     virtual bool Initialize()override;
     virtual void Finish()override;
-    HTCPDataComponent(handle_t handle,std::array<uint8_t,4> ip,uint16_t port);
+    HTCPDataComponent(reactor_handle_t handle,std::array<uint8_t,4> ip,uint16_t port);
     ~HTCPDataComponent();
 public:
     virtual bool OnRead(HBuffer *buffer)override;
