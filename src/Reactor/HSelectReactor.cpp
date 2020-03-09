@@ -13,14 +13,6 @@ HSelectReactor::~HSelectReactor()
     Stop();
     Finish();
 }
-bool HSelectReactor::Initialize()
-{
-    return HReactor::Initialize();
-}
-void HSelectReactor::Finish()
-{
-    HReactor::Finish();
-}
 bool HSelectReactor::RegisterReadImpl(HIOChannel *ch)
 {
     return true;

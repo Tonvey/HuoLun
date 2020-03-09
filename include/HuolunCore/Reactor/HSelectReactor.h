@@ -8,8 +8,6 @@ class HSelectReactor
 public:
     HSelectReactor();
     ~HSelectReactor();
-    virtual bool Initialize()override;
-    virtual void Finish()override;
     virtual void Run()override;
     virtual void Stop()override;
 protected:
