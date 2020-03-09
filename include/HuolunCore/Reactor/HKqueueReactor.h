@@ -1,6 +1,6 @@
 #pragma once
 #include "HuolunCore/HPlatform.h"
-#ifdef __HUOLUN_PLATFORM_APPLE__
+#ifdef __HUOLUN_KQUEUE__
 #include "HReactor.h"
 #include "HReactorFactory.h"
 class HKqueueReactor

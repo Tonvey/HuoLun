@@ -1,6 +1,6 @@
 #pragma once
 #include "HuolunCore/HPlatform.h"
-#ifdef __HUOLUN_PLATFORM_LINUX__
+#ifdef __HUOLUN_EPOLL__
 #include "HReactor.h"
 #include "HReactorFactory.h"
 class HEpollReactor

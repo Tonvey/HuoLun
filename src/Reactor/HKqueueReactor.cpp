@@ -1,6 +1,6 @@
 #include "HuolunCore/Reactor/HKqueueReactor.h"
 #include "HuolunCore/HIOChannel.h"
-#ifdef __HUOLUN_PLATFORM_APPLE__
+#ifdef __HUOLUN_KQUEUE__
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/event.h>

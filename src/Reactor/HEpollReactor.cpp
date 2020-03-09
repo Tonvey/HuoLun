@@ -1,7 +1,7 @@
 #include "HuolunCore/Reactor/HReactor.h"
 #include "HuolunCore/Reactor/HEpollReactor.h"
 #include "HuolunCore/HIOChannel.h"
-#ifdef __HUOLUN_PLATFORM_LINUX__
+#ifdef __HUOLUN_EPOLL__
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/epoll.h>
