@@ -2,6 +2,7 @@
 #include "HuolunCore/Reactor/HReactorFactory.h"
 #include "HuolunCore/Reactor/HKqueueReactor.h"
 #include "HuolunCore/Reactor/HEpollReactor.h"
+#include "HuolunCore/Reactor/HPollReactor.h"
 #include "HuolunCore/Reactor/HSelectReactor.h"
 HReactor *HReactorFactory::CreateReactor()
 {
