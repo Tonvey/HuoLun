@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/epoll.h>
+#include <list>
 HEpollReactor::HEpollReactor()
 {
 }
@@ -95,6 +96,7 @@ void HEpollReactor::Run()
                 break;
             }
         }
+        std::list<HIOChannel*> uninstallList;
         for (int i = 0; i < iEpollRet; i++)
         {
             HIOChannel *poChannel = static_cast<HIOChannel*>(atmpEvent[i].data.ptr);
@@ -103,8 +105,8 @@ void HEpollReactor::Run()
                 poChannel->TriggerRead();
                 if (true == poChannel->IsNeedClosed())
                 {
-                    this->Uninstall(poChannel->GetHandle());
-                    break;
+                    uninstallList.push_back(poChannel);
+                    continue;
                 }
             }
             if (0 != (EPOLLOUT & atmpEvent[i].events))
@@ -112,10 +114,14 @@ void HEpollReactor::Run()
                 poChannel->TriggerWrite();
                 if (true == poChannel->IsNeedClosed())
                 {
-                    this->Uninstall(poChannel->GetHandle());
-                    break;
+                    uninstallList.push_back(poChannel);
+                    continue;
                 }
             }
+        }
+        for(auto itChannel : uninstallList)
+        {
+            Uninstall(itChannel);
         }
     }
 
