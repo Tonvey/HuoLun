@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/errno.h>
 #include <sys/event.h>
+#include <list>
 HKqueueReactor::HKqueueReactor()
 {
 }
@@ -77,6 +78,7 @@ void HKqueueReactor::Run()
                 break;
             }
         }
+        std::list<HIOChannel*> uninstallList;
         for (int i = 0; i < iEpollRet; i++)
         {
             HIOChannel *poChannel = static_cast<HIOChannel *>(atmpEvent[i].udata);
@@ -85,8 +87,8 @@ void HKqueueReactor::Run()
                 poChannel->TriggerRead();
                 if (true == poChannel->IsNeedClosed())
                 {
-                    this->Uninstall(poChannel->GetHandle());
-                    break;
+                    uninstallList.push_back(poChannel);
+                    continue;
                 }
             }
             //if(EVFILT_TIMER == atmpEvent[i].filter)
@@ -105,10 +107,14 @@ void HKqueueReactor::Run()
                 poChannel->TriggerWrite();
                 if (true == poChannel->IsNeedClosed())
                 {
-                    this->Uninstall(poChannel->GetHandle());
-                    break;
+                    uninstallList.push_back(poChannel);
+                    continue;
                 }
             }
+        }
+        for(auto itChannel : uninstallList)
+        {
+            Uninstall(itChannel);
         }
     }
 }
