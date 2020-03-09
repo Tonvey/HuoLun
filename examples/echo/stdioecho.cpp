@@ -6,6 +6,9 @@
 using namespace std;
 int main()
 {
+#ifdef __HUOLUN_PLATFORM_WIN__
+    cerr << "Windows not support standard IO component" << endl;
+#endif
     Huolun core;
     if(!core.Initialize())
     {
