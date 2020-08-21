@@ -2,6 +2,7 @@
 #include "HuolunCore/HTCPListenerComponent.h"
 #include "HuolunCore/HTCPDataComponent.h"
 #include "util/EchoLayer.hpp"
+#include "util/PrintBytesMessageLayer.hpp"
 #include <iostream>
 using namespace std;
 //Factory create the next layer of new socket data component
@@ -12,8 +13,11 @@ public:
     virtual HLayer *CreateLayer(HTCPDataComponent *dataComp)
     {
         auto echo = CreateObject<EchoLayer>();
-        echo->SetDstLayer(dataComp);
-        return echo;
+        auto print = CreateObject<PrintBytesMessageLayer>();
+        print->SetNextHandler(echo);
+        echo->SetDstLayer(print);
+        echo->Release();
+        return print;
     }
 };
 void usage(std::string argv0)

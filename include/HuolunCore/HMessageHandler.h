@@ -36,9 +36,24 @@ public:
 public:
     HMessageHandler *GetNextHandler()const{return mNextHandler;};
     HMessageHandler *GetPrevHandler()const{return mPrevHandler;};
-    void SetNextHandler(HMessageHandler *handler){mNextHandler=handler;};
-    void SetPrevHandler(HMessageHandler *handler){mPrevHandler=handler;};
+    void SetNextHandler(HMessageHandler *handler){
+        if(mNextHandler==handler){
+            return;
+        }
+        if(mNextHandler){
+            mNextHandler->Release();
+            mNextHandler->SetPrevHandler(nullptr);
+        }
+        mNextHandler=handler;
+        if(mNextHandler){
+            mNextHandler->SetPrevHandler(this);
+            mNextHandler->Retain();
+        }
+    };
 private:
+    void SetPrevHandler(HMessageHandler *handler){
+        mPrevHandler=handler;
+    };
     HMessageHandler *mNextHandler=nullptr;
     HMessageHandler *mPrevHandler=nullptr;
 };
